@@ -1,11 +1,12 @@
 import cv2
 import imutils 
 
-image = cv2.imread("image/excoins_1.jpg")
-image = imutils.resize(image,width=500) 
+image = cv2.imread("/image/excoins_1.jpg")
+print(image)
+image = imutils.resize(image, width=500) 
 
 gray = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY) 
-blur = cv2.GaussianBlur(gray,(3,3),7)
+blur = cv2.GaussianBlur(gray, (3,3),7)
 
 t,thresh = cv2.threshold(blur,20,255,cv2.THRESH_BINARY)
 cv2.imshow("threshold",thresh)
@@ -31,7 +32,7 @@ for c in cnts:
         cY = int(M["m01"] / M["m00"])
         
         cv2.putText(clone, "#{}".format(i), (cX - 20, cY), cv2.FONT_HERSHEY_SIMPLEX,
-            1.25, (255, 255, 255), 4)
+            1.25, (0, 255, 255), 4)
     else:
         pass
     
