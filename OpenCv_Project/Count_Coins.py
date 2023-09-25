@@ -1,9 +1,9 @@
 import cv2
 import cvzone
-
+import numpy as np 
 
 cap = cv2.VideoCapture(0)
-cap.set(3,640)
+cap.set(3,200)
 cap.set(4,480)
 cam = True 
 
@@ -20,9 +20,10 @@ def PreProcess(img):
     imgPre = cv2.GaussianBlur(img,(5,5),3)
     threshold1 = cv2.getTrackbarPos("Threshold1", "Settings")
     threshold2 = cv2.getTrackbarPos("Threshold2", "Settings")
-    
     imgPre = cv2.Canny(imgPre, threshold1, threshold2)
-    
+    kernel = np.ones((3,3), np.uint8) 
+    imgPre = cv2.dilate(imgPre, kernel,iterations=1)
+    imgPre = cv2.morphologyEx(imgPre, cv2.MORPH_CLOSE, kernel)
     
     return imgPre
 
@@ -32,7 +33,10 @@ while cam:
     
     imgPre = PreProcess(img)
     
-    imgStacked = cvzone.stackImages([img, imgPre],2,1)
+    
+    imgContours, conFound = cvzone.findContours(img, imgPre,minArea=20)
+    
+    imgStacked = cvzone.stackImages([img, imgPre, imgContours],2,1) 
     # cv2.imshow("Image", img) 
     # cv2.imshow("ImagePre", imgPre) 
     cv2.imshow("Image", imgStacked) 
