@@ -27,6 +27,7 @@ def PreProcess(img):
     
     return imgPre
 
+
 while cam:
     
     ret, img = cap.read() 
