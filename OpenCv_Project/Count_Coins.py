@@ -1,11 +1,26 @@
 import cv2
 import cvzone
 import numpy as np 
+from cvzone.ColorModule import ColorFinder 
 
 cap = cv2.VideoCapture(0)
 cap.set(3,200)
 cap.set(4,480)
 cam = True 
+
+totalMoney = 0
+
+myColorFinder = ColorFinder(False)
+
+# Custom Orange Color 
+hsvVals = {
+            'hmin': 10,
+            'smin': 55,
+            'vmin': 215,
+            'hmax': 42,
+            'smax': 255,
+            'vmax': 255
+        }
 
 def empty(): 
     pass  
@@ -31,16 +46,38 @@ def PreProcess(img):
 while cam:
     
     ret, img = cap.read() 
-    
     imgPre = PreProcess(img)
-    
-    
     imgContours, conFound = cvzone.findContours(img, imgPre,minArea=20)
+    totalMoney = 0
+    
+    if conFound: 
+        for contour in conFound:
+            peri = cv2.arcLength(contour['cnt'], True) 
+            approx = cv2.approxPolyDP(contour['cnt'], 0.02 * peri, True)
+            
+            if len(approx)>5:
+                # print(contour['area'])   
+                area = contour['area']
+                
+                # imgColor, _ = myColorFinder.update(img, hsvVals)
+                
+                if area<2050:
+                    totalMoney += 5
+                elif 2050 <area<2500:
+                    totalMoney +=1
+                else:
+                    totalMoney +=2 
+                    
+    print(totalMoney)        
     
     imgStacked = cvzone.stackImages([img, imgPre, imgContours],2,1) 
+    cvzone.putTextRect(imgStacked,f'Rs.{totalMoney}', (50, 50) )   
     # cv2.imshow("Image", img) 
     # cv2.imshow("ImagePre", imgPre) 
+    
+    
     cv2.imshow("Image", imgStacked) 
+    # cv2.imshow("ImageColor", imgColor)
     
     if cv2.waitKey(5) & 0xFF == ord('q') :
         break 
